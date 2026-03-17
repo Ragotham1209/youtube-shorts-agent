@@ -1,0 +1,51 @@
+name: Daily YouTube Short
+
+on:
+  schedule:
+    # Run at 8:00 PM UTC every day
+    # Adjust for your timezone: e.g., 8 PM EST = 1 AM UTC next day (cron: "0 1 * * *")
+    # 8 PM PST = 4 AM UTC next day (cron: "0 4 * * *")
+    # 8 PM IST = 2:30 PM UTC (cron: "30 14 * * *")
+    - cron: "0 0 * * *"  # <-- CHANGE THIS to match 8 PM in your timezone
+
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  create-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-liberation imagemagick
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run YouTube Shorts Agent
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+        run: python main.py
+
+      - name: Commit topic history
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add topic_history.json
+          git diff --cached --quiet || git commit -m "Update topic history [skip ci]"
+          git push
