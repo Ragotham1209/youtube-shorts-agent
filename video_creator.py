@@ -1,24 +1,18 @@
 """
 Create YouTube Shorts video: stock footage background + text overlay + voiceover.
-Compatible with moviepy 2.x
+Uses moviepy 2.x API only. No moviepy.editor dependency.
 """
 import os
 import requests
 import textwrap
-
-try:
-    from moviepy.editor import (
-        VideoFileClip, AudioFileClip, TextClip, CompositeVideoClip,
-        concatenate_videoclips, ColorClip,
-    )
-    MOVIEPY_V2 = False
-except ImportError:
-    from moviepy import (
-        VideoFileClip, AudioFileClip, TextClip, CompositeVideoClip,
-        concatenate_videoclips, ColorClip,
-    )
-    MOVIEPY_V2 = True
-
+from moviepy import (
+    VideoFileClip,
+    AudioFileClip,
+    TextClip,
+    CompositeVideoClip,
+    concatenate_videoclips,
+    ColorClip,
+)
 import config
 
 
@@ -63,74 +57,22 @@ def fetch_stock_footage(query: str, num_clips: int = 3) -> list[str]:
     return downloaded
 
 
-# --- Compatibility helpers for moviepy v1 vs v2 ---
-
-def _set_duration(clip, duration):
-    if MOVIEPY_V2:
-        return clip.with_duration(duration)
-    return clip.set_duration(duration)
-
-def _set_position(clip, pos):
-    if MOVIEPY_V2:
-        return clip.with_position(pos)
-    return clip.set_position(pos)
-
-def _set_audio(clip, audio):
-    if MOVIEPY_V2:
-        return clip.with_audio(audio)
-    return clip.set_audio(audio)
-
-def _set_opacity(clip, opacity):
-    if MOVIEPY_V2:
-        return clip.with_opacity(opacity)
-    return clip.set_opacity(opacity)
-
-def _resize(clip, newsize):
-    if MOVIEPY_V2:
-        return clip.resized(newsize)
-    return clip.resize(newsize)
-
-def _subclip(clip, t1, t2):
-    if MOVIEPY_V2:
-        return clip.subclipped(t1, t2)
-    return clip.subclip(t1, t2)
-
-def _loop(clip, duration):
-    return clip.loop(duration=duration)
-
-
 def _create_text_clip(
     text: str, duration: float, fontsize: int = config.FONT_SIZE, position: str = "center"
 ) -> TextClip:
     """Create a styled text overlay clip."""
     wrapped = textwrap.fill(text, width=22)
-
-    if MOVIEPY_V2:
-        txt_clip = TextClip(
-            text=wrapped,
-            font_size=fontsize,
-            color=config.FONT_COLOR,
-            stroke_color=config.STROKE_COLOR,
-            stroke_width=config.STROKE_WIDTH,
-            font="/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-            method="caption",
-            size=(config.VIDEO_WIDTH - 100, None),
-        )
-    else:
-        txt_clip = TextClip(
-            wrapped,
-            fontsize=fontsize,
-            color=config.FONT_COLOR,
-            stroke_color=config.STROKE_COLOR,
-            stroke_width=config.STROKE_WIDTH,
-            font="Liberation-Sans-Bold",
-            method="caption",
-            size=(config.VIDEO_WIDTH - 100, None),
-            align="center",
-        )
-
-    txt_clip = _set_duration(txt_clip, duration)
-    txt_clip = _set_position(txt_clip, ("center", position))
+    txt_clip = TextClip(
+        text=wrapped,
+        font_size=fontsize,
+        color=config.FONT_COLOR,
+        stroke_color=config.STROKE_COLOR,
+        stroke_width=config.STROKE_WIDTH,
+        font="/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+        method="caption",
+        size=(config.VIDEO_WIDTH - 100, None),
+    )
+    txt_clip = txt_clip.with_duration(duration).with_position(("center", position))
     return txt_clip
 
 
@@ -139,29 +81,24 @@ def _build_segment_clip(bg_clip, text: str, audio_path: str, start_y: str = "cen
     audio = AudioFileClip(audio_path)
     duration = audio.duration + 0.5
 
-    # Trim or loop background to match audio duration
     if bg_clip.duration < duration:
-        bg = _loop(bg_clip, duration)
+        bg = bg_clip.loop(duration=duration)
     else:
-        bg = _subclip(bg_clip, 0, duration)
+        bg = bg_clip.subclipped(0, duration)
 
-    bg = _resize(bg, (config.VIDEO_WIDTH, config.VIDEO_HEIGHT))
+    bg = bg.resized((config.VIDEO_WIDTH, config.VIDEO_HEIGHT))
 
-    # Semi-transparent overlay for text readability
     overlay = ColorClip(
         size=(config.VIDEO_WIDTH, config.VIDEO_HEIGHT),
         color=(0, 0, 0),
-    )
-    overlay = _set_opacity(overlay, 0.4)
-    overlay = _set_duration(overlay, duration)
+    ).with_opacity(0.4).with_duration(duration)
 
     txt = _create_text_clip(text, duration, position=start_y)
 
     composite = CompositeVideoClip(
         [bg, overlay, txt], size=(config.VIDEO_WIDTH, config.VIDEO_HEIGHT)
     )
-    composite = _set_audio(composite, audio)
-    composite = _set_duration(composite, duration)
+    composite = composite.with_audio(audio).with_duration(duration)
 
     return composite
 
@@ -203,7 +140,6 @@ def create_video(script: dict, audio_files: list[str]) -> str:
     print("[*] Compositing final video...")
     final = concatenate_videoclips(segments, method="compose")
 
-    # Pad or trim to hit the target duration (default 55s)
     target = config.VIDEO_DURATION
     if final.duration < target:
         pad_duration = target - final.duration
@@ -214,7 +150,7 @@ def create_video(script: dict, audio_files: list[str]) -> str:
         )
         final = concatenate_videoclips([final, pad], method="compose")
     elif final.duration > target:
-        final = _subclip(final, 0, target)
+        final = final.subclipped(0, target)
 
     output_path = os.path.join(config.OUTPUT_DIR, "short.mp4")
     final.write_videofile(

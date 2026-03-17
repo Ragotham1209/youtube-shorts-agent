@@ -1,46 +1,22 @@
 """
 Create long-form YouTube videos (10-20 min) with screen-recording style visuals.
-Compatible with moviepy 2.x
+Uses moviepy 2.x API only. No moviepy.editor dependency.
 """
 import os
 import asyncio
 import edge_tts
-
-try:
-    from moviepy.editor import (
-        ImageClip, AudioFileClip, CompositeVideoClip,
-        concatenate_videoclips, ColorClip,
-    )
-    MOVIEPY_V2 = False
-except ImportError:
-    from moviepy import (
-        ImageClip, AudioFileClip, CompositeVideoClip,
-        concatenate_videoclips, ColorClip,
-    )
-    MOVIEPY_V2 = True
-
+from moviepy import (
+    ImageClip,
+    AudioFileClip,
+    CompositeVideoClip,
+    concatenate_videoclips,
+    ColorClip,
+)
 import config
 from screen_renderer import render_code_frame, render_terminal_frame, render_title_card
 
-# Voice settings for long-form (slightly slower for clarity)
 LONG_FORM_VOICE = "en-US-AndrewMultilingualNeural"
 LONG_FORM_RATE = "-2%"
-
-
-def _set_duration(clip, duration):
-    if MOVIEPY_V2:
-        return clip.with_duration(duration)
-    return clip.set_duration(duration)
-
-def _set_audio(clip, audio):
-    if MOVIEPY_V2:
-        return clip.with_audio(audio)
-    return clip.set_audio(audio)
-
-def _resize(clip, newsize):
-    if MOVIEPY_V2:
-        return clip.resized(newsize)
-    return clip.resize(newsize)
 
 
 async def _generate_section_audio(text: str, output_path: str) -> str:
@@ -56,9 +32,9 @@ def _make_section_clip(frame_path: str, audio_path: str, pad: float = 1.0):
     duration = audio.duration + pad
 
     img_clip = ImageClip(frame_path)
-    img_clip = _set_duration(img_clip, duration)
-    img_clip = _resize(img_clip, (config.VIDEO_WIDTH, config.VIDEO_HEIGHT))
-    img_clip = _set_audio(img_clip, audio)
+    img_clip = img_clip.with_duration(duration)
+    img_clip = img_clip.resized((config.VIDEO_WIDTH, config.VIDEO_HEIGHT))
+    img_clip = img_clip.with_audio(audio)
 
     return img_clip
 
