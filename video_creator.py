@@ -13,7 +13,7 @@ from moviepy import (
     concatenate_videoclips,
     ColorClip,
 )
-from moviepy.video.fx import loop
+from moviepy.video.fx import Loop
 import config
 
 
@@ -83,7 +83,7 @@ def _build_segment_clip(bg_clip, text: str, audio_path: str, start_y: str = "cen
     duration = audio.duration
 
     if bg_clip.duration < duration:
-        bg = loop(bg_clip, duration=duration)
+        bg = Loop(bg_clip, duration=duration)
     else:
         bg = bg_clip.subclipped(0, duration)
 
