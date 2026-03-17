@@ -29,7 +29,12 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
-          python -c "import moviepy.editor; print('moviepy OK')"
+          pip show moviepy
+          python -c "try:
+            from moviepy.editor import VideoFileClip; v='1.x'
+          except ImportError:
+            from moviepy import VideoFileClip; v='2.x'
+          print(f'moviepy {v} OK')"
 
       - name: Run YouTube Shorts Agent
         env:
