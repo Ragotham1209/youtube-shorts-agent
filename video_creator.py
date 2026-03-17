@@ -140,16 +140,9 @@ def create_video(script: dict, audio_files: list[str]) -> str:
     print("[*] Compositing final video...")
     final = concatenate_videoclips(segments, method="compose")
 
+    # Enforce a max duration if needed, but no padding/black screen.
     target = config.VIDEO_DURATION
-    if final.duration < target:
-        pad_duration = target - final.duration
-        pad = ColorClip(
-            size=(config.VIDEO_WIDTH, config.VIDEO_HEIGHT),
-            color=(0, 0, 0),
-            duration=pad_duration,
-        )
-        final = concatenate_videoclips([final, pad], method="compose")
-    elif final.duration > target:
+    if final.duration > target:
         final = final.subclipped(0, target)
 
     output_path = os.path.join(config.OUTPUT_DIR, "short.mp4")
