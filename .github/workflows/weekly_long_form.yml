@@ -1,16 +1,21 @@
-name: Daily YouTube Short
+name: Weekly Long-Form Video
 
 on:
   schedule:
-    # 8:00 PM IST = 2:30 PM UTC
-    - cron: "30 14 * * *"
+    # Every Sunday at 2:00 PM IST = 8:30 AM UTC
+    - cron: "30 8 * * 0"
 
-  workflow_dispatch: # Allow manual trigger from GitHub UI
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (script only, no video)"
+        type: boolean
+        default: false
 
 jobs:
   create-and-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60  # longer timeout for 10-20 min videos
 
     steps:
       - name: Checkout repository
@@ -25,24 +30,29 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg fonts-liberation imagemagick
+          sudo apt-get install -y ffmpeg fonts-liberation fonts-dejavu-core imagemagick
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
-      - name: Run YouTube Shorts Agent
+      - name: Run Long-Form Video Agent
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
-        run: python main.py
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python main.py --long-form --dry-run
+          else
+            python main.py --long-form
+          fi
 
       - name: Commit topic history
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add topic_history.json
-          git diff --cached --quiet || git commit -m "Update topic history [skip ci]"
+          git add long_topic_history.json
+          git diff --cached --quiet || git commit -m "Update long-form topic history [skip ci]"
           git push
