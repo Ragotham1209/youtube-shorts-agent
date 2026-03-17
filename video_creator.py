@@ -79,7 +79,7 @@ def _create_text_clip(
 def _build_segment_clip(bg_clip, text: str, audio_path: str, start_y: str = "center"):
     """Build a single segment: background + text + audio."""
     audio = AudioFileClip(audio_path)
-    duration = audio.duration + 0.5
+    duration = audio.duration
 
     if bg_clip.duration < duration:
         bg = bg_clip.loop(duration=duration)

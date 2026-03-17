@@ -27,9 +27,8 @@ async def _generate_section_audio(text: str, output_path: str) -> str:
 
 
 def _make_section_clip(frame_path: str, audio_path: str, pad: float = 1.0):
-    """Create a video clip from a frame image and audio."""
     audio = AudioFileClip(audio_path)
-    duration = audio.duration + pad
+    duration = audio.duration
 
     img_clip = ImageClip(frame_path)
     img_clip = img_clip.with_duration(duration)
