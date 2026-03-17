@@ -16,6 +16,8 @@ jobs:
   create-and-publish:
     runs-on: ubuntu-latest
     timeout-minutes: 60  # longer timeout for 10-20 min videos
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
