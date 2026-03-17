@@ -6,7 +6,7 @@ on:
     # Adjust for your timezone: e.g., 8 PM EST = 1 AM UTC next day (cron: "0 1 * * *")
     # 8 PM PST = 4 AM UTC next day (cron: "0 4 * * *")
     # 8 PM IST = 2:30 PM UTC (cron: "30 14 * * *")
-    - cron: "0 0 * * *"  # <-- CHANGE THIS to match 8 PM in your timezone
+    - cron: "30 14 * * *"  # 8:00 PM IST Zone
 
   workflow_dispatch: # Allow manual trigger from GitHub UI
 
