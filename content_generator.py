@@ -19,6 +19,7 @@ FALLBACK_TOPICS = [
             "Use cases: ML training, log analytics, IoT streams.",
         ],
         "tags": ["datalake", "dataengineering", "bigdata", "spark", "datapipeline"],
+        "visual_query": "data lake water reflection digital",
     },
     {
         "title": "ETL vs ELT Explained",
@@ -31,6 +32,7 @@ FALLBACK_TOPICS = [
             "Modern data teams prefer ELT for flexibility.",
         ],
         "tags": ["etl", "elt", "dataengineering", "bigquery", "datawarehouse"],
+        "visual_query": "data processing pipeline server",
     },
     {
         "title": "Apache Kafka in 60 Seconds",
@@ -43,6 +45,7 @@ FALLBACK_TOPICS = [
             "Used by LinkedIn, Uber, Netflix for real-time data.",
         ],
         "tags": ["kafka", "streaming", "dataengineering", "realtime", "eventdriven"],
+        "visual_query": "fast moving digital stream traffic",
     },
     {
         "title": "Why dbt Changed Everything",
@@ -55,6 +58,7 @@ FALLBACK_TOPICS = [
             "Analytics engineers love it. You will too.",
         ],
         "tags": ["dbt", "sql", "dataengineering", "analytics", "datatransformation"],
+        "visual_query": "coding sql terminal data",
     },
     {
         "title": "Star Schema vs Snowflake Schema",
@@ -67,6 +71,7 @@ FALLBACK_TOPICS = [
             "Choose based on query patterns, not theory.",
         ],
         "tags": ["datamodeling", "starschema", "datawarehouse", "dataengineering", "sql"],
+        "visual_query": "network constellation connection digital",
     },
     {
         "title": "Data Partitioning Explained",
@@ -79,6 +84,7 @@ FALLBACK_TOPICS = [
             "Over-partitioning creates too many small files. Balance it.",
         ],
         "tags": ["partitioning", "dataengineering", "bigdata", "performance", "sql"],
+        "visual_query": "filing cabinet folders sorted",
     },
     {
         "title": "What is Apache Airflow?",
@@ -91,6 +97,7 @@ FALLBACK_TOPICS = [
             "Used by Airbnb, Spotify, and thousands of teams.",
         ],
         "tags": ["airflow", "orchestration", "dataengineering", "python", "datapipeline"],
+        "visual_query": "clock gear mechanics timing",
     },
     {
         "title": "CDC: Capture Every Change",
@@ -103,6 +110,7 @@ FALLBACK_TOPICS = [
             "CDC powers real-time analytics and sync.",
         ],
         "tags": ["cdc", "debezium", "dataengineering", "realtime", "database"],
+        "visual_query": "mirror reflection change live",
     },
     {
         "title": "Data Quality: The Silent Killer",
@@ -115,6 +123,7 @@ FALLBACK_TOPICS = [
             "Invest in quality now or pay in bad decisions later.",
         ],
         "tags": ["dataquality", "dataengineering", "testing", "greatexpectations", "data"],
+        "visual_query": "magnifying glass inspection data",
     },
     {
         "title": "Medallion Architecture Explained",
@@ -127,6 +136,7 @@ FALLBACK_TOPICS = [
             "Databricks popularized this pattern. It works everywhere.",
         ],
         "tags": ["medallion", "databricks", "dataengineering", "datalakehouse", "architecture"],
+        "visual_query": "gold silver bronze medals trophies",
     },
 ]
 
@@ -134,11 +144,8 @@ SYSTEM_PROMPT = """You are a Data Engineering content creator for YouTube Shorts
 Generate a script for a 50-second vertical video. Return valid JSON only.
 
 Format:
-{
-  "title": "Short catchy title (max 60 chars)",
-  "hook": "Attention-grabbing opening line (max 15 words)",
-  "segments": ["Point 1", "Point 2", "Point 3", "Point 4", "Point 5"],
-  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
+  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
+  "visual_query": "Relevant search keywords for pexels stock footage"
 }
 
 Rules:

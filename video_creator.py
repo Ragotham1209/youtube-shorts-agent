@@ -106,9 +106,10 @@ def _build_segment_clip(bg_clip, text: str, audio_path: str, start_y: str = "cen
 def create_video(script: dict, audio_files: list[str]) -> str:
     """Create the full YouTube Short video."""
     print("[*] Fetching stock footage...")
+    query = script.get("visual_query", "technology data server")
     stock_clips_paths = fetch_stock_footage(
-        query="technology data server",
-        num_clips=3,
+        query=query,
+        num_clips=6,  # One for each potential segment (Hook + 5 Segments)
     )
 
     if not stock_clips_paths:
@@ -133,6 +134,7 @@ def create_video(script: dict, audio_files: list[str]) -> str:
     segments = []
 
     for i, (text, audio_path) in enumerate(zip(all_texts, audio_files)):
+        # Use a unique clip for each segment if available
         bg = stock_clips[i % len(stock_clips)]
         segment = _build_segment_clip(bg, text, audio_path, start_y="center")
         segments.append(segment)
