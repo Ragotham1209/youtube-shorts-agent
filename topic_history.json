@@ -4,5 +4,6 @@
   "Apache Kafka in 60 Seconds",
   "What is Apache Airflow?",
   "What is a Data Lake?",
-  "Star Schema vs Snowflake Schema"
+  "Star Schema vs Snowflake Schema",
+  "Data Partitioning Explained"
 ]
