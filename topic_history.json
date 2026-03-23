@@ -6,5 +6,6 @@
   "What is a Data Lake?",
   "Star Schema vs Snowflake Schema",
   "Data Partitioning Explained",
-  "Data Quality: The Silent Killer"
+  "Data Quality: The Silent Killer",
+  "Medallion Architecture Explained"
 ]
